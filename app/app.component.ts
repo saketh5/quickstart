@@ -1,34 +1,28 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
+import {Hero} from './hero';
+import { HeroService } from './hero.service';
+
 
 @Component({
     selector: 'my-app',
     template: `<h1>{{title}}</h1>
-  <div *ngIf="selectedHero">
-  <h2>{{selectedHero.name}} details!</h2>
-  <div><label>id: </label>{{selectedHero.id}}</div>
-  <div>
-    <label>name: </label>
-    //1-way data Binding
-    <input value ="{{selectedHero.name}}" placeholder="name">
-    // 2-way Data Binding 
-    //<input [(ngModel)]="selectedHero.name" placeholder="name">
-  </div>
-  </div>
-  <h2>My Heros</h2>
+ <h2>My Heroes</h2>
    <ul class = "heroes">
-     <li *ngFor="let hero of heros" 
+     <li *ngFor="let hero of heroes" 
      [class.selected] = "hero === selectedHero"
      (click) = "onSelect(hero)">
        <span class="badge">{{hero.id}}</span> {{hero.name}}
      </li>
-  </ul>`,
+  </ul>
+ <my-hero-detail [hero]="selectedHero"></my-hero-detail>
+ `,
   
   styles: [`
   .selected {
     background-color: #CFD8DC !important;
     color: white;
   }
-  .heroes {
+  .heroes { 
     margin: 0 0 2em 0;
     list-style-type: none;
     padding: 0;
@@ -72,11 +66,14 @@ import { Component } from '@angular/core';
     border-radius: 4px 0 0 4px;
   }
 `],
-
+ providers: [HeroService]
+ 
 })
-export class AppComponent { 
-    title =  'My First Angular App';
-    heros = Heros;
+
+export class AppComponent implements OnInit { 
+   
+    title =  '';
+    heroes: Hero[];
     selectedHero: Hero;
    
     hero : Hero = {
@@ -84,29 +81,28 @@ export class AppComponent {
         name : 'Windstorm',
 
     }
-     onSelect(hero: Hero): void {
+
+      onSelect(hero: Hero): void {
         this.selectedHero = hero;
     }
+
+    constructor(private heroService: HeroService) {}
+
+    getHeroes(): void {
+         this.heroService.getHeroesSlowly().then( heroes => this.heroes = heroes); 
+    }
+
+    ngOnInit(): void {
+      this.getHeroes();
+    }
+   
+       
+  
 }
 
-const Heros : Hero[] = [
-  { id: 11, name: 'Mr. Nice' },
-  { id: 12, name: 'Narco' },
-  { id: 13, name: 'Bombasto' },
-  { id: 14, name: 'Celeritas' },
-  { id: 15, name: 'Magneta' },
-  { id: 16, name: 'RubberMan' },
-  { id: 17, name: 'Dynama' },
-  { id: 18, name: 'Dr IQ' },
-  { id: 19, name: 'Magma' },
-  { id: 20, name: 'Tornado' }
-];
 
-export class Hero {
-    id : number;
-    name : string;
 
-}
+
 
 
 
